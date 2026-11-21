@@ -32,13 +32,12 @@ const auth = betterAuth({
     },
   },
 
-  // trustedOrigins: [
-  //   "http://localhost:3000",
-  // ],
-       trustedOrigins: [
-  "http://localhost:3000",
-  "http://localhost:5000",
-],
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://localhost:5000",
+    "https://salonbook-client-ten.vercel.app",
+  ],
+
   emailAndPassword: {
     enabled: true,
   },
