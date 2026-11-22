@@ -1,3 +1,4 @@
+
 import "dotenv/config";
 
 import express from "express";
@@ -18,13 +19,6 @@ import {
   setDatabase as setPaymentDatabase,
   handleStripeWebhook,
 } from "./routes/paymentRoutes.js";
-
-// import {
-//   router as paymentRoutes,
-//   setDatabase as setPaymentDatabase,
-// } from "./routes/paymentRoutes.js";
-
-
 
 import {
   router as serviceRoutes,
@@ -50,18 +44,43 @@ setDatabase(db);
 setAppointmentDatabase(db);
 setUserDatabase(db);
 setPaymentDatabase(db);
+
 // ===============================
 // CORS
 // ===============================
-// app.use(
-//   cors({
-//     origin: "http://localhost:3000",
-//     credentials: true,
-//   })
-// );
-    app.use(
+
+const productionClientUrl =
+  process.env.CLIENT_URL || "http://localhost:3000";
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  productionClientUrl,
+];
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) {
+    return true;
+  }
+
+  if (allowedOrigins.includes(origin)) {
+    return true;
+  }
+
+  // Allow SalonBook Vercel preview deployments
+  return /^https:\/\/salonbook-client-[a-z0-9-]+-we-407e\.vercel\.app$/i.test(
+    origin
+  );
+};
+
+app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -70,23 +89,29 @@ setPaymentDatabase(db);
 // Better Auth
 // Must be before express.json()
 // ===============================
+
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
+// ===============================
 // Stripe Webhook
+// ===============================
+
 app.post(
   "/api/payments/webhook",
   express.raw({ type: "application/json" }),
   handleStripeWebhook
-); 
+);
 
 // ===============================
 // JSON Body Parser
 // ===============================
+
 app.use(express.json());
 
 // ===============================
 // Server Test
 // ===============================
+
 app.get("/", (req, res) => {
   res.send("SalonBook Server is running!");
 });
@@ -94,6 +119,7 @@ app.get("/", (req, res) => {
 // ===============================
 // Protected Admin Test Route
 // ===============================
+
 app.get(
   "/api/admin/test",
   requireAuth,
@@ -109,19 +135,23 @@ app.get(
 // ===============================
 // Start Server
 // ===============================
+
 async function startServer() {
   try {
     // ===============================
     // API Routes
     // ===============================
+
     app.use("/api/services", serviceRoutes);
     app.use("/api/upload", uploadRoutes);
     app.use("/api/appointments", appointmentRoutes);
     app.use("/api/users", userRoutes);
     app.use("/api/payments", paymentRoutes);
+
     // ===============================
     // Start Server
     // ===============================
+
     app.listen(PORT, () => {
       console.log(
         `SalonBook Server running on port ${PORT}`
