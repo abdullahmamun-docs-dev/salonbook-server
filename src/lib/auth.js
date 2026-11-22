@@ -1,7 +1,7 @@
-
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
+import { jwt } from "better-auth/plugins";
 
 const client = new MongoClient(process.env.MONGODB_URI);
 const db = client.db("salonbook");
@@ -28,7 +28,7 @@ const auth = betterAuth({
         input: false,
       },
 
-      blocked: {
+      isBlocked: {
         type: "boolean",
         required: false,
         defaultValue: false,
@@ -42,11 +42,11 @@ const auth = betterAuth({
   // ===============================
 
   trustedOrigins: [
-  "http://localhost:3000",
-  "http://localhost:5000",
-  "https://salonbook-client-ten.vercel.app",
-  "https://*.vercel.app",
-],
+    "http://localhost:3000",
+    "http://localhost:5000",
+    "https://salonbook-client-ten.vercel.app",
+    "https://*.vercel.app",
+  ],
 
   // ===============================
   // Cross-Origin Cookie Settings
@@ -88,6 +88,14 @@ const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     },
   },
+
+  // ===============================
+  // JWT
+  // ===============================
+
+  plugins: [
+    jwt(),
+  ],
 });
 
 export default auth;

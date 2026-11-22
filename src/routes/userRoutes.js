@@ -1,4 +1,3 @@
-
 import express from "express";
 import { ObjectId } from "mongodb";
 
@@ -33,7 +32,7 @@ router.get(
           name: 1,
           email: 1,
           role: 1,
-          blocked: 1,
+          isBlocked: 1,
           emailVerified: 1,
           createdAt: 1,
         })
@@ -74,19 +73,17 @@ router.patch(
         });
       }
 
-      const result = await db
-        .collection("user")
-        .updateOne(
-          {
-            _id: new ObjectId(userId),
+      const result = await db.collection("user").updateOne(
+        {
+          _id: new ObjectId(userId),
+        },
+        {
+          $set: {
+            isBlocked: true,
+            updatedAt: new Date(),
           },
-          {
-            $set: {
-              blocked: true,
-              updatedAt: new Date(),
-            },
-          }
-        );
+        }
+      );
 
       if (result.matchedCount === 0) {
         return res.status(404).json({
@@ -125,19 +122,17 @@ router.patch(
         });
       }
 
-      const result = await db
-        .collection("user")
-        .updateOne(
-          {
-            _id: new ObjectId(userId),
+      const result = await db.collection("user").updateOne(
+        {
+          _id: new ObjectId(userId),
+        },
+        {
+          $set: {
+            isBlocked: false,
+            updatedAt: new Date(),
           },
-          {
-            $set: {
-              blocked: false,
-              updatedAt: new Date(),
-            },
-          }
-        );
+        }
+      );
 
       if (result.matchedCount === 0) {
         return res.status(404).json({
