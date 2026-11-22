@@ -42,13 +42,11 @@ const auth = betterAuth({
   // ===============================
 
   trustedOrigins: [
-    "http://localhost:3000",
-    "http://localhost:5000",
-    "https://salonbook-client-ten.vercel.app",
-
-    // Allow SalonBook Vercel preview deployments
-    "https://salonbook-client-*.vercel.app",
-  ],
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "https://salonbook-client-ten.vercel.app",
+  "https://*.vercel.app",
+],
 
   // ===============================
   // Cross-Origin Cookie Settings
